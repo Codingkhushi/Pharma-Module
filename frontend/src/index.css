@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F5F6FA;
+  --surface: #FFFFFF;
+  --surface-2: #F0F1F6;
+  --border: #E4E6EF;
+  --border-strong: #CDD0E0;
+  --text-primary: #16193A;
+  --text-secondary: #6B7099;
+  --text-muted: #9EA3BE;
+  --accent: #2563EB;
+  --accent-light: #EFF4FF;
+  --accent-hover: #1D4ED8;
+  --green: #16A34A;
+  --green-light: #DCFCE7;
+  --amber: #D97706;
+  --amber-light: #FEF3C7;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --purple: #7C3AED;
+  --purple-light: #EDE9FE;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 1px 3px rgba(22,25,58,0.06), 0 1px 2px rgba(22,25,58,0.04);
+  --shadow-md: 0 4px 12px rgba(22,25,58,0.08), 0 2px 4px rgba(22,25,58,0.04);
+  --shadow-lg: 0 8px 24px rgba(22,25,58,0.10), 0 4px 8px rgba(22,25,58,0.06);
+  --sidebar-w: 56px;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg);
+  font-family: var(--font);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: var(--font); cursor: pointer; border: none; outline: none; }
+input, select, textarea { font-family: var(--font); outline: none; }
+a { text-decoration: none; color: inherit; }
