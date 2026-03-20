@@ -6,9 +6,9 @@ A simplified Pharmacy CRM with a Dashboard and Inventory page, built with FastAP
 
 | | |
 |---|---|
-| **Frontend** | _Vercel URL here_ |
-| **Backend API** | _Railway/Render URL here_ |
-| **API Docs** | `http://127.0.0.1:8000/docs` |
+| **Frontend** | https://pharma-module.vercel.app/|
+| **Backend API** | https://pharma-module.onrender.com|
+| **API Docs** | https://pharma-module.onrender.com/docs |
 
 ---
 
