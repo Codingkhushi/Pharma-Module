@@ -34,4 +34,7 @@ export const updatePOStatus = (id, status) =>
 // ── Categories ───────────────────────────────────────────────────────────────
 export const getCategories = () => api.get('/api/categories')
 
+// ── Reorder Suggestions ──────────────────────────────────────────────────────
+export const getReorderSuggestions = () => api.get('/api/dashboard/reorder-suggestions')
+
 export default api

@@ -21,13 +21,13 @@ export default function Sidebar() {
       left: 0, top: 0,
       zIndex: 100,
     }}>
-      <div style={{
+      {/* <div style={{
         width: 28, height: 28,
         borderRadius: '50%',
         background: 'var(--accent)',
         marginBottom: 20,
         flexShrink: 0,
-      }} />
+      }} /> */}
 
       {links.map(({ to, icon: Icon, label }) => (
         <NavLink key={to} to={to} end={to === '/'} title={label}
@@ -49,7 +49,7 @@ export default function Sidebar() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: 'rgba(255,255,255,0.4)',
         }}>
-          <Settings size={18} />
+          {/* <Settings size={18} /> */}
         </div>
       </div>
     </aside>

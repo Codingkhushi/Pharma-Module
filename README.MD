@@ -8,7 +8,7 @@ A simplified Pharmacy CRM with a Dashboard and Inventory page, built with FastAP
 |---|---|
 | **Frontend** | _Vercel URL here_ |
 | **Backend API** | _Railway/Render URL here_ |
-| **API Docs** | `{backend-url}/docs` |
+| **API Docs** | `http://127.0.0.1:8000/docs` |
 
 ---
 
@@ -100,6 +100,46 @@ All dashboard cards load independently via separate endpoints so each card can u
 | GET | `/api/dashboard/low-stock` | Count + list of Low Stock and Out of Stock medicines |
 | GET | `/api/dashboard/purchase-orders` | Pending and completed purchase order counts |
 | GET | `/api/dashboard/recent-sales` | Last 10 sales with computed totals |
+| GET | `/api/dashboard/reorder-suggestions` | Auto-detected medicines needing reorder, grouped by supplier |
+
+#### Reorder Suggestions — Response Shape
+
+```json
+{
+  "total_items": 3,
+  "groups": [
+    {
+      "supplier": "MedSupply Co.",
+      "po_exists": false,
+      "items": [
+        {
+          "id": 1,
+          "name": "Paracetamol 500mg",
+          "quantity": 10,
+          "status": "Low Stock",
+          "expiry_date": "2026-04-15",
+          "reasons": [
+            { "type": "low_stock",      "detail": "Only 10 units left (threshold: 20)" },
+            { "type": "expiring_soon",  "detail": "Expires in 26 days — order replacement stock" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+A medicine is included if **any** of the following conditions are true:
+
+| Condition | Reason type | Colour |
+|-----------|-------------|--------|
+| `status = 'Out of Stock'` (quantity = 0) | `out_of_stock` | Red |
+| `status = 'Low Stock'` (quantity < 20, above zero) | `low_stock` | Amber |
+| `expiry_date` within 30 days AND quantity > 0 | `expiring_soon` | Purple |
+
+The third condition is what distinguishes this from the low-stock card. A medicine can be `Active` by status — healthy stock, valid expiry — but expiring in 28 days. The pharmacist needs to order replacement stock now, before the batch expires and creates a stockout gap. The existing status system would not flag this medicine at all.
+
+`po_exists: true` means a Pending purchase order already exists for that supplier. The frontend shows a "PO Pending" badge instead of a "New PO" button, preventing duplicate orders from being accidentally created.
 
 ### Inventory — `/api/medicines`
 
@@ -304,7 +344,21 @@ The scheduler uses the same `derive_status()` function as every other code path 
 
 **Reason:** Per-medicine thresholds (where each medicine has its own `min_stock` column) would be more realistic — a rare injectable needs only 5 units, a common painkiller needs 500. For this assignment a single global threshold is correct, but the architecture is designed to replace the constant with a per-medicine column without changing `derive_status()`.
 
-### 6. SQLite for tests, PostgreSQL for production
+### 6. Reorder Suggestions — proactive vs reactive design
+
+**Decision:** Added a `/api/dashboard/reorder-suggestions` endpoint that automatically surfaces medicines needing reorder, grouped by supplier, without any manual input from the pharmacist.
+
+**Why this matters:** The rest of the system is reactive — it shows you what already happened (sales, current stock, existing POs). The reorder card is the only proactive feature. A pharmacist relying entirely on the status system would only notice a problem after a medicine hits `Out of Stock`. By then, the stockout is already happening. The 30-day expiry lookahead catches the problem while there is still time to act.
+
+**The grouping by supplier** is a deliberate UX choice. A pharmacist doesn't think in terms of individual medicines — they think in terms of supplier orders. Showing "3 medicines from MedSupply Co. need attention" lets them compose one purchase order per supplier rather than processing each medicine individually.
+
+**The `po_exists` flag** prevents duplicate purchase orders. Before presenting a "New PO" button, the endpoint checks whether a Pending PO for that supplier already exists. If it does, the UI shows a "PO Pending" badge instead. This is a data-consistency concern surfaced at the UI layer — without it, a pharmacist could accidentally create two POs for the same supplier in the same session.
+
+**Tradeoff — 30-day window is hardcoded:** The lookahead window should ideally be configurable per medicine (a fast-moving antibiotic might need 60 days lead time; a slow-moving specialist drug might need 7). The same pattern as `LOW_STOCK_THRESHOLD` applies — hardcoded to a sensible default now, designed to be replaced with a per-medicine `reorder_lead_days` column without changing the query logic.
+
+**Tradeoff — no push notifications:** The card only shows suggestions when the pharmacist visits the dashboard. A production system would send a daily email or Slack message when the reorder list is non-empty. The endpoint is structured to support this — calling it from a scheduled job and emailing the response is a single addition that doesn't require changing the endpoint itself.
+
+### 7. SQLite for tests, PostgreSQL for production
 
 **Decision:** Tests run against a file-based SQLite database, never the real PostgreSQL.
 

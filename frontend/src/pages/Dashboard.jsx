@@ -9,6 +9,7 @@ import {
     getDashboardSalesSummary,
     getMedicines,
 } from '../api'
+import ReorderSuggestions from '../components/ReorderSuggestions'
 import { Button, Card, EmptyState, PageHeader, Spinner, StatusBadge } from '../components/ui'
 import { useFetch } from '../hooks/useFetch'
 
@@ -91,9 +92,7 @@ function SaleModal({ onClose, onSuccess }) {
   }
 
   return (
-    <div 
-    onKeyDown={e => { if (e.key === 'Enter') e.preventDefault() }}
-    style={{
+    <div style={{
       position: 'fixed', inset: 0, background: 'rgba(22,25,58,0.5)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       zIndex: 1000, padding: 24,
@@ -243,7 +242,7 @@ export default function Dashboard() {
           loading={l2}
         />
         <SummaryCard
-          label="Stock Alerts"
+          label="Low Stock Items"
           value={stock?.low_stock_count ?? '—'}
           badge={stock?.low_stock_count > 0 ? 'Action Needed' : 'OK'}
           badgeColor={stock?.low_stock_count > 0 ? 'var(--amber)' : 'var(--green)'}
@@ -261,6 +260,9 @@ export default function Dashboard() {
           loading={l4}
         />
       </div>
+
+      {/* Reorder Suggestions */}
+      <ReorderSuggestions />
 
       {/* Recent sales */}
       <Card style={{ padding: 24 }}>
